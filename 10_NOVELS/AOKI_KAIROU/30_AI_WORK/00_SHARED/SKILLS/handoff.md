@@ -3,7 +3,7 @@
 STATUS: working operational rule / proposal until user adopts branch changes
 
 ## Purpose
-Transfer a bounded task between Gemini, ChatGPT, Claude, or a new session without treating chat history or AI memory as canon.
+Transfer a bounded task between Gemini, ChatGPT, Claude, or a new session without treating chat history or AI memory as canon, while minimizing manual file attachment and copy/paste mistakes.
 
 ## When to use
 Use after one AI/session completes a meaningful stage and another AI/session must continue it.
@@ -48,22 +48,38 @@ DATE:
 - `READ`: minimum file set needed by the next worker.
 - `NEXT`: one bounded next action with explicit non-goals where useful.
 
-## Cross-AI transfer procedure
-1. Save the current AI's output in its own `30_AI_WORK/<AI>/` area.
-2. Write a short HANDOFF; do not dump the entire conversation into it.
-3. Before handing an edited artifact onward, compare it with the source or independently verify the claimed changes when practical.
-4. If the next AI can read the GitHub branch/files directly, provide the repository, branch, HANDOFF path, and a short instruction to execute `NEXT`.
-5. If the next AI cannot reliably read the working branch or requires manual file attachment, create one temporary Markdown transfer packet containing only:
+## Preferred cross-AI transfer procedure: GitHub-persisted handoff
+1. Produce the substantive artifact in the producing AI's `30_AI_WORK/<AI>/` area, or another explicitly authorized working path.
+2. Save the actual artifact to GitHub **before** claiming completion.
+3. Save a short change/evaluation memo if needed.
+4. Independently compare or verify edited artifacts against their source when practical.
+5. Save the HANDOFF last. In `COMPLETED`, name exact GitHub paths and include commit SHA(s) when useful.
+6. Confirm that the committed files can be fetched/read from GitHub.
+7. The receiving AI reads from GitHub and executes `NEXT`; the user should not need to re-upload the same files.
+
+A handoff is not fully persisted merely because a file was generated inside an AI chat. If the producing environment cannot write to GitHub, say so explicitly.
+
+## Read-only fallback
+If the producing or receiving AI cannot reliably read/write the shared GitHub state:
+1. Use a designated write-capable AI/tool to persist the outputs in GitHub when possible.
+2. If direct persistence is impossible, create one temporary Markdown transfer packet containing only:
    - AGENTS
    - current STATUS
    - latest relevant HANDOFF
    - files named in READ
    - any supplementary verification note explicitly needed for NEXT
-6. Mark the packet as a temporary transport copy, not source of truth.
-7. After receiving the next AI's result, store its actual output and HANDOFF back in GitHub.
+3. Mark the packet as a temporary transport copy, not source of truth.
+4. After the next AI returns results, store the actual outputs and HANDOFF back in GitHub at the earliest write-capable step.
+
+## Branch rule
+- Prefer `main` as the shared synchronization surface for ordinary WIP and AI outputs so all connected AIs can see the same current state.
+- Directory authority, not branch location, determines whether material is formal.
+- `20_WIP/`, `30_AI_WORK/`, and `90_OTHER/` remain non-formal even on `main`.
+- Use `work/*` when isolation is useful for risky/large changes or formal CANON/FINISHED candidates, not as a mandatory transport layer.
 
 ## Token discipline
-- Prefer one transfer packet over many manual attachments when direct branch access fails.
+- Prefer direct GitHub reads over manual multi-file attachments.
+- When direct reads fail, prefer one transfer packet over many attachments.
 - Do not include SESSION_ARCHIVE unless required to resolve a specific provenance question.
 - Do not make the next AI reread irrelevant CANON/WIP files.
 - Use lightweight models for short organization/review when they can finish reliably; use a stronger long-context model for long-form rewriting when lightweight execution stalls. This is a heuristic, not a fixed model rule.
@@ -73,3 +89,4 @@ DATE:
 - Do not promote WIP/AI output to CANON or FINISHED without explicit user approval.
 - Never infer approval from another AI's wording such as “recommended”, “completed”, or “final”.
 - If a model surfaces remembered rules not present in the current READ set, ignore them or list them as an external-context issue rather than applying them.
+- If the environment has write access, do not overwrite existing files blindly; fetch/compare first and write to the intended working path.
