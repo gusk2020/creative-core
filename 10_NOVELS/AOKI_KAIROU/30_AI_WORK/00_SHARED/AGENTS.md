@@ -22,7 +22,10 @@ AI must not modify, promote, or declare content in these locations final without
 - `30_AI_WORK/`
 - `90_OTHER/`
 
-AI may freely propose, compare, audit, rewrite, and experiment here. AI output remains a proposal until the user explicitly adopts it.
+AI may propose, compare, audit, rewrite, and experiment here when the task authorizes it. AI output remains a proposal until the user explicitly adopts it.
+
+**Authority is determined by path and user approval, not merely by the Git branch that contains the file.**
+A file in `20_WIP/` or `30_AI_WORK/` remains working/proposal material even when it is present on `main`.
 
 ## Other AI output
 - Do not treat another AI's statement as canon merely because it exists in a file or chat.
@@ -33,20 +36,33 @@ AI may freely propose, compare, audit, rewrite, and experiment here. AI output r
 1. `AGENTS.md`
 2. `STATUS.md`
 3. newest relevant file in `HANDOFF/`
-4. only the CANON / FINISHED / WIP files needed for the current task
+4. only the CANON / FINISHED / WIP / AI_WORK files needed for the current task
 
 Do not load raw session archives unless they are actually needed.
 
 ## Branch and approval workflow
-- `main` = formal shared state.
-- `work/*` = working branches.
+- `main` = shared synchronization surface for all AIs. It may contain both formal and working material; directory authority rules still apply.
+- `work/*` = optional isolation branches for risky, large, experimental, or review-heavy changes. Do not require a working branch merely to share ordinary WIP or AI outputs.
 - AI-specific branches are not required.
-- Changes to CANON or FINISHED should normally follow:
-  1. work on `work/*`
+- Ordinary AI outputs should normally be written to the producing AI's area under `30_AI_WORK/<AI>/` and may be shared through `main` when write access is available.
+- Changes to `00_CANON/` or `10_FINISHED/` should normally follow:
+  1. prepare the candidate outside the formal path, or on `work/*`
   2. independent diff/review by another AI when useful
   3. user review
-  4. merge to `main` only after explicit user approval
+  4. modify/promote formal paths only after explicit user approval
 - Do not self-approve formal-setting changes.
+- A merge to `main` does **not** by itself promote files in `20_WIP/`, `30_AI_WORK/`, or `90_OTHER/` to formal status.
+
+## Shared GitHub handoff rule
+The goal is to avoid manual attachment mistakes between AIs.
+
+- When the producing AI/session has GitHub write access, it must save its actual output to GitHub before declaring the handoff complete.
+- Save the substantive artifact first, then any change memo, then the HANDOFF.
+- HANDOFF `COMPLETED` should name the exact committed paths. Include a commit SHA when available and useful.
+- The receiving AI should fetch/read the committed files from GitHub rather than asking the user to re-upload copies.
+- If the producing environment is read-only, state that limitation explicitly. The handoff is not considered fully persisted until a designated write-capable step stores the outputs in GitHub.
+- Manual transfer packets remain a fallback for read-only or branch-visibility failures, not the preferred steady-state workflow.
+- Never ask the user to paste a GitHub Personal Access Token into chat as a workaround.
 
 ## STATUS.md
 `STATUS.md` is a whiteboard, not a history log. Keep only:
@@ -102,7 +118,7 @@ Initial candidates, only when repetition justifies them:
 Current tendencies are useful defaults, not hierarchy:
 - Gemini: setting organization/expansion, plot and initial drafts, Notebook-based cross-document reference
 - ChatGPT: setting audit, logic/science/history consistency, critique, review, app-development support
-- Claude: prose drafting, Japanese-language finishing, revision, long-form writing, GitHub work via Claude Code when used
+- Claude: prose drafting, Japanese-language finishing, revision, long-form writing, GitHub work via Claude Code or another write-capable connector when direct persistence is required
 
 Choose the AI by task. Roles may change.
 
